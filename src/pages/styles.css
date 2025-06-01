@@ -42,6 +42,7 @@ label {
   border-radius: 4px;
   font-size: 16px;
   background-color: white;
+  color: black; /* Añadido para asegurar que el texto sea negro */
 }
 
 .btn-submit {
@@ -107,6 +108,10 @@ label {
   gap: 15px;
 }
 
+.filtros-form input,
+.filtros-form select {
+  color: black; /* Añadido para asegurar que el texto sea negro */
+}
 .filtro-grupo {
   flex: 1;
   min-width: 200px;
@@ -202,4 +207,128 @@ table tr:nth-child(even) {
   .nav-item {
     margin: 5px 0;
   }
+}
+
+/* Estilos para la sección de libros */
+.books-section {
+  margin-top: 2rem;
+  padding: 1rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.books-section h2 {
+  color: #333;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 0.5rem;
+}
+
+.books-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.book-card {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease-in-out;
+}
+
+.book-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.book-card h3 {
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.book-card p {
+  margin: 0.5rem 0;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+/* Estilos para mensajes de éxito y error */
+.success-message {
+  background-color: #d4edda;
+  color: #155724;
+  padding: 10px 15px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  border-left: 4px solid #28a745;
+  font-weight: 500;
+}
+
+.error-message {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 10px 15px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  border-left: 4px solid #dc3545;
+  font-weight: 500;
+}
+
+/* Estilos para botones deshabilitados */
+button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Estilos responsivos para la sección de libros */
+@media (max-width: 768px) {
+  .books-list {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .books-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .filtros-form {
+    flex-direction: column;
+  }
+  
+  .filtro-grupo {
+    width: 100%;
+  }
+  
+  .nav-list {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .nav-item {
+    margin: 5px 0;
+  }
+}
+
+/* Estilos para el ID de la solicitud */
+.solicitud-id {
+  margin-top: 8px;
+  padding: 5px 10px;
+  background-color: #e8f4f8;
+  border-radius: 4px;
+  display: inline-block;
+  font-size: 0.9rem;
+}
+
+.solicitud-id strong {
+  font-weight: 600;
+  color: #0056b3;
+  font-family: monospace;
+  font-size: 1rem;
 }
