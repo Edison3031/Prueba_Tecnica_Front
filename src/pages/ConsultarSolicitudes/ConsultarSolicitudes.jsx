@@ -1,146 +1,119 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { getSolicitudes } from '../../services/api';
 
 const ConsultarSolicitudes = () => {
-  // Estado para almacenar las solicitudes (simuladas)
-  const [solicitudes, setSolicitudes] = useState([
-    { id: 1, nombre: 'Juan Pérez', tipo: 'Tipo 1', fecha: '2023-05-15', descripcion: 'Solicitud de prueba 1', estado: 'aprobada' },
-    { id: 2, nombre: 'María López', tipo: 'Tipo 2', fecha: '2023-05-16', descripcion: 'Solicitud de prueba 2', estado: 'rechazada' },
-    { id: 3, nombre: 'Carlos Rodríguez', tipo: 'Tipo 3', fecha: '2023-05-17', descripcion: 'Solicitud de prueba 3', estado: 'pendiente' },
-    { id: 4, nombre: 'Ana Martínez', tipo: 'Tipo 1', fecha: '2023-05-18', descripcion: 'Solicitud de prueba 4', estado: 'aprobada' },
-  ]);
+  // Estado para almacenar las solicitudes
+  const [solicitudes, setSolicitudes] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  
+  // Estados para la paginación
+  const [paginaActual, setPaginaActual] = useState(1);
+  const registrosPorPagina = 10;
 
-  // Estado para filtros
-  const [filtros, setFiltros] = useState({
-    estado: '',
-    tipo: '',
-    fechaDesde: '',
-    fechaHasta: ''
-  });
+  // Cargar solicitudes al montar el componente
+  useEffect(() => {
+    const fetchSolicitudes = async () => {
+      setLoading(true);
+      try {
+        const data = await getSolicitudes();
+        // La función getSolicitudes ya devuelve un array directamente
+        setSolicitudes(data);
+        setError(null);
+      } catch (err) {
+        setError('Error al cargar las solicitudes. Por favor, intente nuevamente.');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // Manejar cambios en los filtros
-  const handleFiltroChange = (e) => {
-    const { name, value } = e.target;
-    setFiltros({
-      ...filtros,
-      [name]: value
-    });
+    fetchSolicitudes();
+  }, []);
+
+  // Calcular índices para la paginación
+  const indexUltimoRegistro = paginaActual * registrosPorPagina;
+  const indexPrimerRegistro = indexUltimoRegistro - registrosPorPagina;
+  const registrosActuales = solicitudes.slice(indexPrimerRegistro, indexUltimoRegistro);
+  const totalPaginas = Math.ceil(solicitudes.length / registrosPorPagina);
+
+  // Función para cambiar de página
+  const cambiarPagina = (numeroPagina) => {
+    setPaginaActual(numeroPagina);
   };
 
-  // Filtrar solicitudes según los criterios
-  const solicitudesFiltradas = solicitudes.filter(solicitud => {
-    // Filtro por estado
-    if (filtros.estado && solicitud.estado !== filtros.estado) {
-      return false;
-    }
-    
-    // Filtro por tipo
-    if (filtros.tipo && solicitud.tipo !== filtros.tipo) {
-      return false;
-    }
-    
-    // Filtro por fecha desde
-    if (filtros.fechaDesde && new Date(solicitud.fecha) < new Date(filtros.fechaDesde)) {
-      return false;
-    }
-    
-    // Filtro por fecha hasta
-    if (filtros.fechaHasta && new Date(solicitud.fecha) > new Date(filtros.fechaHasta)) {
-      return false;
-    }
-    
-    return true;
-  });
+  // Generar números de página
+  const numerosPagina = [];
+  for (let i = 1; i <= totalPaginas; i++) {
+    numerosPagina.push(i);
+  }
 
   return (
     <div className="container">
       <h1>Consultar Solicitudes</h1>
       
-      <div className="filtros-container">
-        <h3>Filtros</h3>
-        <div className="filtros-form">
-          <div className="filtro-grupo">
-            <label htmlFor="estado">Estado:</label>
-            <select 
-              id="estado" 
-              name="estado" 
-              value={filtros.estado} 
-              onChange={handleFiltroChange}
-            >
-              <option value="">Todos</option>
-              <option value="pendiente">Pendiente</option>
-              <option value="aprobada">Aprobada</option>
-              <option value="rechazada">Rechazada</option>
-            </select>
-          </div>
-          
-          <div className="filtro-grupo">
-            <label htmlFor="tipo">Tipo:</label>
-            <select 
-              id="tipo" 
-              name="tipo" 
-              value={filtros.tipo} 
-              onChange={handleFiltroChange}
-            >
-              <option value="">Todos</option>
-              <option value="Tipo 1">Tipo 1</option>
-              <option value="Tipo 2">Tipo 2</option>
-              <option value="Tipo 3">Tipo 3</option>
-            </select>
-          </div>
-          
-          <div className="filtro-grupo">
-            <label htmlFor="fechaDesde">Desde:</label>
-            <input 
-              type="date" 
-              id="fechaDesde" 
-              name="fechaDesde" 
-              value={filtros.fechaDesde} 
-              onChange={handleFiltroChange}
-            />
-          </div>
-          
-          <div className="filtro-grupo">
-            <label htmlFor="fechaHasta">Hasta:</label>
-            <input 
-              type="date" 
-              id="fechaHasta" 
-              name="fechaHasta" 
-              value={filtros.fechaHasta} 
-              onChange={handleFiltroChange}
-            />
-          </div>
-        </div>
-      </div>
-      
       <div className="solicitudes-tabla">
-        <h3>Resultados ({solicitudesFiltradas.length})</h3>
-        {solicitudesFiltradas.length === 0 ? (
-          <p>No se encontraron solicitudes con los criterios seleccionados.</p>
+        <h3>Resultados ({solicitudes.length})</h3>
+        {loading ? (
+          <p>Cargando solicitudes...</p>
+        ) : error ? (
+          <div className="error-message">{error}</div>
+        ) : solicitudes.length === 0 ? (
+          <p>No se encontraron solicitudes.</p>
         ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Tipo</th>
-                <th>Fecha</th>
-                <th>Estado</th>
-                <th>Descripción</th>
-              </tr>
-            </thead>
-            <tbody>
-              {solicitudesFiltradas.map(solicitud => (
-                <tr key={solicitud.id} className={`estado-${solicitud.estado}`}>
-                  <td>{solicitud.id}</td>
-                  <td>{solicitud.nombre}</td>
-                  <td>{solicitud.tipo}</td>
-                  <td>{solicitud.fecha}</td>
-                  <td>{solicitud.estado}</td>
-                  <td>{solicitud.descripcion}</td>
+          <>
+            <table>
+              <thead>
+                <tr>
+                  <th>Título</th>
+                  <th>Descripción</th>
+                  <th>Monto</th>
+                  <th>Estado</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {registrosActuales.map(solicitud => (
+                  <tr key={solicitud.ID} className={`estado-${solicitud.Estado.toLowerCase()}`}>
+                    <td>{solicitud.Titulo}</td>
+                    <td>{solicitud.Descripcion}</td>
+                    <td>{solicitud.Monto}</td>
+                    <td>{solicitud.Estado}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            
+            {/* Paginación */}
+            {totalPaginas > 1 && (
+              <div className="paginacion">
+                <button 
+                  onClick={() => cambiarPagina(paginaActual - 1)} 
+                  disabled={paginaActual === 1}
+                  className="btn-pagina"
+                >
+                  Anterior
+                </button>
+                
+                {numerosPagina.map(numero => (
+                  <button
+                    key={numero}
+                    onClick={() => cambiarPagina(numero)}
+                    className={`btn-pagina ${paginaActual === numero ? 'activa' : ''}`}
+                  >
+                    {numero}
+                  </button>
+                ))}
+                
+                <button 
+                  onClick={() => cambiarPagina(paginaActual + 1)} 
+                  disabled={paginaActual === totalPaginas}
+                  className="btn-pagina"
+                >
+                  Siguiente
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

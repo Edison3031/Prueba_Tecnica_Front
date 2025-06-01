@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { getBooks, createSolicitud } from '../../services/api';
+import React, { useState } from 'react';
+import { createSolicitud } from '../../services/api';
 
 const GenerarSolicitud = () => {
   const [formData, setFormData] = useState({
@@ -7,31 +7,10 @@ const GenerarSolicitud = () => {
     descripcion: '',
     monto: ''
   });
-  const [books, setBooks] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState(null);
   const [createdSolicitudId, setCreatedSolicitudId] = useState(null);
-
-  useEffect(() => {
-    const fetchBooks = async () => {
-      setLoading(true);
-      try {
-        const data = await getBooks();
-        setBooks(data);
-        setError(null);
-      } catch (err) {
-        setError('Error al cargar los libros. Por favor, intente nuevamente.');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBooks();
-  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -147,30 +126,6 @@ const GenerarSolicitud = () => {
             {submitting ? 'Enviando...' : 'Enviar Solicitud'}
           </button>
         </form>
-      </div>
-
-      <div className="books-section">
-        <h2>Libros disponibles</h2>
-        {loading ? (
-          <p>Cargando libros...</p>
-        ) : error ? (
-          <p className="error-message">{error}</p>
-        ) : (
-          <div className="books-list">
-            {books && books.length > 0 ? (
-              books.map((book) => (
-                <div key={book.id} className="book-card">
-                  <h3>{book.title}</h3>
-                  <p><strong>Autor:</strong> {book.author}</p>
-                  <p><strong>Año:</strong> {book.year}</p>
-                  {book.description && <p>{book.description}</p>}
-                </div>
-              ))
-            ) : (
-              <p>No hay libros disponibles.</p>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );

@@ -50,5 +50,28 @@ export const createSolicitud = async (solicitudData) => {
   }
 };
 
+// Servicio para obtener todas las solicitudes
+export const getSolicitudes = async () => {
+  try {
+    const response = await api.get('/Solicitudes');
+    // La respuesta tiene un formato específico donde los datos están en response.data.body como string JSON
+    if (response.data && response.data.body) {
+      try {
+        // Intentar parsear el body que viene como string
+        const parsedBody = JSON.parse(response.data.body);
+        // Devolver el array de items
+        return parsedBody.items || [];
+      } catch (parseError) {
+        console.error('Error al parsear el body de la respuesta:', parseError);
+        return [];
+      }
+    }
+    return [];
+  } catch (error) {
+    console.error('Error al obtener las solicitudes:', error);
+    throw error;
+  }
+};
+
 // Exportamos el cliente axios configurado para uso general
 export default api;
